@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "1.3.0",
+  "application": {
+    "uuid": "094dbf85-b5aa-4be5-b4ed-4f7e2074056c",
+    "type": "OnlineApp",
+    "name": "bishal_garage",
+    "vendor": "Bishal Garage",
+    "version": "0.1.0",
+    "defaultLanguage": "en_GB",
+    "uiDescriptions": [
+      {
+        "applicationFilePath": "./uiDescriptions/ID8/application.xml",
+        "uiDescriptionFilePath": "./uiDescriptions/ID8/uiDescription.json",
+        "hmi": [
+          "ID8"
+        ]
+      }
+    ],
+    "stringBundleUuid": "de6c470f-5b22-473a-85cd-fcda3cd331cc",
+    "resourceBundleUuid": "083c1844-acf5-4415-85af-e0d2a02ff6b9",
+    "variantGroups": [
+      {
+        "stringsPath": "./variantGroups/Common/texts",
+        "resourcesPath": "./variantGroups/Common/images",
+        "hmi": [
+          "ID8"
+        ],
+        "brands": [
+          "BMW"
+        ]
+      }
+    ],
+    "entryPoints": [
+      {
+        "name": "bishal_garage",
+        "uuid": "9348345e-b2e4-42fc-a349-291d291b0909",
+        "textId": "SID_TITLE",
+        "icon": "garage_icon.png",
+        "insertionStateId": 20974,
+        "insertionFocusId": 2,
+        "insertionMode": "INSERT_BELOW",
+        "insertionOrder": 0,
+        "insertionPriority": 0,
+        "previewType": "NONE",
+        "bookmarkable": true,
+        "private": null,
+        "appearance": "DEFAULT",
+        "isGroupHeader": false,
+        "insertionGroup": 0
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+    "name":  "g80-apps",
+    "version":  "0.1.0",
+    "private":  true,
+    "description":  "Bishal's M3 App: a read-only live-data ID8 OAP dashboard with saved custom gauges",
+    "license":  "GPL-3.0-or-later",
+    "engines":  {
+                    "node":  "\u003e=18"
+                },
+    "scripts":  {
+                    "generate":  "node tools/generate.js",
+                    "validate":  "node tools/validate.js",
+                    "test":  "node tests/run.js",
+                    "build":  "node tools/package.js",
+                    "preview":  "node tools/serve.js"
+                }
+}

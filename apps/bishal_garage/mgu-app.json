@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "bishal_garage",
+  "version": "0.1.0",
+  "title": "Bishal's M3 App",
+  "description": "G80 M3 dashboard for iDrive 8: live data, pulls, G-meter, brake and drag timers, tire warm-up and a read-only fault scanner. US units.",
+  "mguHmi": ["ID8"],
+  "tree": "package",
+  "modules": ["src/garage.js", "src/model.js", "src/data.js", "src/vehicle.js", "src/preferences.js", "src/session.js", "src/view.js", "src/record.js", "src/mgu_render_client.js"],
+  "sdk": ["oap-sdk/src/core/OnlineApp.js", "oap-sdk/src/someip/someipBuilders"],
+  "requires": { "mgu-render": "0.3.0" },
+  "mguNeeds": ["renderer"]
+}

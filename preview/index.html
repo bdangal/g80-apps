@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bishal's M3 App</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#05080e;color:#f3f6fc;font:15px 'Segoe UI',Arial,sans-serif;min-height:100vh;display:grid;place-items:center}main{width:min(100%,1440px)}.screen{position:relative;width:100%;aspect-ratio:1440/382;background:#080e18;overflow:hidden}canvas{display:block;width:100%;height:100%;touch-action:none}.hotspot{position:absolute;border:0;padding:0;background:transparent;color:transparent;cursor:pointer;touch-action:none}.hotspot:focus-visible{outline:1px solid #9acfff;outline-offset:-3px}.hotspot[aria-current=page]{cursor:default}.developer{display:none}.dev{display:block;padding:30px 24px}.dev main{margin:auto}.dev .developer{display:block}.dev header{margin-bottom:24px}.dev h1{font-size:24px;font-weight:500;margin:0 0 8px}.dev p{color:#94a4bb;line-height:1.6}.dev .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:18px 0}.controls button,.controls select{background:#101b2b;color:#f3f6fc;border:1px solid #263b56;padding:10px 14px;font:inherit}.dev footer{display:flex;gap:24px;margin-top:20px}a{color:#88bfff}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}#status{font-size:13px;color:#94a4bb;min-height:36px;margin-top:18px}
+</style>
+</head>
+<body><main>
+<header class="developer"><h1>Bishal's M3 App / Developer view</h1><p>1440 × 382 logical app area. Browser demo only, not a vehicle connection or an HMI emulator.</p></header>
+<section class="screen" aria-label="Bishal's M3 App ID8 application">
+<canvas width="1440" height="382" aria-hidden="true"></canvas>
+<nav id="navigation" aria-label="Dashboard pages and controller actions"></nav>
+</section>
+<div class="sr-only" id="accessibleSummary" aria-live="polite"></div>
+<section class="developer" aria-label="Development tools">
+<div id="status" role="status"></div>
+<div class="controls"><button id="previous">Rotate previous</button><button id="next">Rotate next</button><button id="select">Press controller</button><button id="back">Back / leave app</button><button id="open">Open app</button>
+<label for="scenario">Data state</label><select id="scenario"><option value="demo">Demo</option><option value="disconnected">Disconnected</option><option value="unavailable">Connected / unavailable fixture</option><option value="stale">Stale fixture</option></select></div>
+<footer><a href="/">Presentation view</a><a href="/gallery">Updated screenshots</a></footer>
+<p>Left / Right or swipe: pages. Up / Down + Enter: rotary simulation. Escape: leave. D: toggle developer view. Installed native RHMI retains focus and BACK. Presentation mode changes only this wrapper, never the data source.</p>
+<p>Read-only SOME/IP / OBD integration is not executed in this browser. Ethanol, fuel level, range and odometer are not mapped on the car. Calculated engine power is labeled EST., not dyno power. Validity fixtures are test data only. Settings persist locally, separate from the head unit.</p>
+</section>
+</main><script src="/bundle.js"></script><script src="/preview.js"></script></body></html>

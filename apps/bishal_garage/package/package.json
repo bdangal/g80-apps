@@ -1,0 +1,41 @@
+{
+  "name": "bishal_garage",
+  "version": "0.1.0",
+  "description": "G80 M3 dashboard for iDrive 8: live data, pulls, G-meter, brake and drag timers, tire warm-up and a read-only fault scanner. US units.",
+  "main": "javascript/runner.js",
+  "author": "Bishal Garage",
+  "license": "GPL-3.0-or-later",
+  "mguHmi": [
+    "ID8"
+  ],
+  "mguNeeds": [
+    "renderer"
+  ],
+  "oapAppSettings": {
+    "maxDiskUsage": 26214400,
+    "cpuLimit": 20,
+    "memoryThresholdKB": 131072,
+    "priority": "PRIO_MEDIUM",
+    "visibility": "FOREGROUND",
+    "latencyClass": "FOREGROUND",
+    "loggingId": "M3GR",
+    "userLoginRequired": false,
+    "backgroundPriority": 150,
+    "someipManifest": "manifest.json"
+  },
+  "files": [
+    "config",
+    "rhmiData",
+    "artwork",
+    "package.json",
+    "npm-shrinkwrap.json",
+    "permissions.json",
+    "manifest.json",
+    "javascript",
+    "LICENSE",
+    "NOTICE.md"
+  ],
+  "engines": {
+    "node": ">=8.16.2"
+  }
+}
