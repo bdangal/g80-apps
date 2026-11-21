@@ -220,7 +220,7 @@ function harness(background, noEntry) {
     const build = require('../tools/package'); build({ github: 'sample-owner/g80-apps', tag: 'catalog' });
     const catalog = JSON.parse(fs.readFileSync(path.join(gate.root, 'dist/catalog.json')));
     const artifact = catalog.components[0].artifact;
-    assert.strictEqual(new URL(artifact.url).href, 'https://github.com/sample-owner/g80-apps/releases/download/catalog/bishal_garage@0.1.0.tgz');
+    assert.strictEqual(new URL(artifact.url).href, 'https://github.com/sample-owner/g80-apps/releases/download/catalog/bishal_garage@0.1.1.tgz');
     assert.strictEqual(catalog.components[0].build, 'unit');
     assert(archive.unpack(fs.readFileSync(path.join(gate.root, 'dist', artifact.name)))['mgu-app.json']);
     build();

@@ -12,7 +12,6 @@ const CDS2 = 'de.bmw.infotainment.vehicle.CDS2';
 const TPMS = 'de.bmw.infotainment.vehicle.TPMS';
 const UNITS = 'de.bmw.infotainment.vehicle.Vehicle';
 const ENVIRONMENT = 'de.bmw.infrastructure.EnvironmentalInformation';
-const BASIC = 'de.bmw.infrastructure.analytics.BasicDataSet';
 const ALL_UNITS = 0xDF;
 const ECUS = { 0x01: 'ACSM airbag', 0x06: 'ICAM cameras', 0x08: 'SRR corner radar', 0x0D: 'HKFM tailgate', 0x10: 'BDC gateway', 0x12: 'DME engine',
   0x13: 'DME 2', 0x18: 'EGS gearbox', 0x1D: 'TFM fuel tank', 0x20: 'SRR corner radar', 0x21: 'FRR front radar', 0x23: 'SAS assist sensors',
@@ -157,7 +156,6 @@ class VehicleData {
       ['statusTyreTemperature', 10000, (x, at) => corners.forEach((c) => this.nativeValue('tyreT' + c[0], x['actualValueTemperatureTyre' + c[1]], 65535, 1, -40, this.carUnits.temperature || (this.psiSeen ? 'F' : 'C'), TPMS, at))]
     ]);
     this.connect('environment', ENVIRONMENT, '1', [['ExteriorTemperature', 5000, (x, at) => this.nativeValue('ambient', x.temperatureExterior, 255, 0.5, -40, 'C', ENVIRONMENT, at)]]);
-    this.connect('basic', BASIC, '1', [['basicDataSet', 2000, (x, at) => this.nativeValue('gearboxOil', x.valueTemperatureTransmissionOil, 255, 1, -48, 'C', BASIC, at)]]);
     this.connect('tasu', TASU, 'SystemFunctionsInternalTasuInst1');
     const tick = () => { this.emit(); this.schedule(tick, 500); }; tick();
   }
@@ -337,4 +335,4 @@ class VehicleData {
     // Proxies/subscriptions belong to this process; late callbacks are ignored.
   }
 }
-module.exports = { VehicleData: VehicleData, PIDS: PIDS, gear: gear, allowed: allowed, parseDtcs: parseDtcs, ECUS: ECUS, interfaces: [CDS, VEHICLE, FES, GEAR, TASU, CDS2, TPMS, UNITS, ENVIRONMENT, BASIC] };
+module.exports = { VehicleData: VehicleData, PIDS: PIDS, gear: gear, allowed: allowed, parseDtcs: parseDtcs, ECUS: ECUS, interfaces: [CDS, VEHICLE, FES, GEAR, TASU, CDS2, TPMS, UNITS, ENVIRONMENT] };

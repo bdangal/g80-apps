@@ -72,6 +72,11 @@ function validate() {
   ['en_GB', 'en_US'].forEach((language) => check(json(path.join(tree, 'rhmiData/variantGroups/Common/texts', language + '.json'))[application.entryPoints[0].textId] === 'Bishal\'s M3 App', 'Missing tile title'));
   const proxies = json(path.join(tree, 'manifest.json')).proxies;
   ['entrypoint2.EntryPoint2', 'entrypoint2.EntryPointManager2', 'remote2.RemoteHmi2', 'remote2.RemoteHmiApplication2', 'resourcemanagement2.ResourceManager2'].forEach((name) => check(proxies['de.bmw.infotainment.hmi.' + name], 'Missing ID8 interface: ' + name));
+  // ID8 installs the manifest unchecked; one field or interface the firmware lacks fails installPackage. Match the vehicle proxies of known-good ID8 apps.
+  ['vehicle.CDS', 'vehicle.CDS2', 'vehicle.TPMS', 'vehicle.Vehicle', 'vehicle.Vehicle2', 'drivingexcitement.FES'].forEach((name) => check(proxies['de.bmw.infotainment.' + name] === '*', 'ID8 vehicle proxy must be "*": ' + name));
+  ['EnvironmentalInformation', 'VehicleInformation'].forEach((name) => check(proxies['de.bmw.infrastructure.' + name] === '*', 'ID8 vehicle proxy must be "*": ' + name));
+  check(proxies['com.harman.infotainment.systemfunctions.tasu.tasu.InternalTasu'] === '*', 'ID8 TASU proxy must be "*"');
+  check(!proxies['de.bmw.infrastructure.analytics.BasicDataSet'], 'BasicDataSet is not offered to ID8 apps');
   json(path.join(tree, 'permissions.json'));
   const font = json(path.join(tree, 'artwork/font.json'));
   check(fs.statSync(path.join(tree, 'artwork/font.alpha')).size === font.width * font.height, 'Font atlas length mismatch');

@@ -53,22 +53,8 @@
                 "setFilterForProvisioningData"
             ]
         },
-        "de.bmw.infotainment.vehicle.Vehicle": {
-            "instances": [
-                "1"
-            ],
-            "attributes": {
-                "statusNewCurrentUnitsStatusExt": "rs"
-            }
-        },
-        "de.bmw.infrastructure.EnvironmentalInformation": {
-            "instances": [
-                "1"
-            ],
-            "attributes": {
-                "ExteriorTemperature": "s"
-            }
-        },
+        "de.bmw.infotainment.vehicle.Vehicle": "*",
+        "de.bmw.infrastructure.EnvironmentalInformation": "*",
         "de.bmw.infotainment.certification.Certification": "*",
         "de.bmw.infotainment.hmi.usecasemanagement.UseCaseInstance": "*",
         "de.bmw.infotainment.hmi.usecasemanagement.UseCaseProvider": "*",
@@ -121,77 +107,13 @@
                 "genericMethod"
             ]
         },
-        "de.bmw.infrastructure.VehicleInformation": {
-            "instances": [
-                "1"
-            ],
-            "attributes": {
-                "statusGearboxDrive": "rs"
-            }
-        },
-        "de.bmw.infotainment.drivingexcitement.FES": {
-            "instances": [
-                "1"
-            ],
-            "attributes": {
-                "statusActualValueTorque2": "rs"
-            }
-        },
-        "de.bmw.infotainment.vehicle.Vehicle2": {
-            "instances": [
-                "1"
-            ],
-            "attributes": {
-                "statusCarSpeed2": "rs"
-            }
-        },
-        "de.bmw.infotainment.vehicle.CDS": {
-            "instances": [
-                "1"
-            ],
-            "attributes": {
-                "statusEngineSpeed2": "rs",
-                "statusEngineTemperature": "rs"
-            }
-        },
-        "com.harman.infotainment.systemfunctions.tasu.tasu.InternalTasu": {
-            "broadcasts": [
-                "sendTasuResponse"
-            ],
-            "methods": [
-                "sendTasuRequest"
-            ],
-            "instances": [
-                "SystemFunctionsInternalTasuInst1"
-            ]
-        },
-        "de.bmw.infotainment.vehicle.CDS2": {
-            "instances": [
-                "1"
-            ],
-            "attributes": {
-                "statusLongitudinalAccelerationMassCenter": "rs",
-                "statusLateralAccelerationMassCenter": "rs"
-            }
-        },
-        "de.bmw.infotainment.vehicle.TPMS": {
-            "instances": [
-                "1"
-            ],
-            "attributes": {
-                "statusTyreTemperature": "rs",
-                "statusTyrePressure": "rs",
-                "statusTargetTyrePressure": "rs"
-            }
-        },
-        "de.bmw.infrastructure.analytics.BasicDataSet": {
-            "instances": [
-                "1"
-            ],
-            "attributes": {
-                "basicDataSet": "s"
-            }
-        }
+        "de.bmw.infrastructure.VehicleInformation": "*",
+        "de.bmw.infotainment.drivingexcitement.FES": "*",
+        "de.bmw.infotainment.vehicle.Vehicle2": "*",
+        "de.bmw.infotainment.vehicle.CDS": "*",
+        "com.harman.infotainment.systemfunctions.tasu.tasu.InternalTasu": "*",
+        "de.bmw.infotainment.vehicle.CDS2": "*",
+        "de.bmw.infotainment.vehicle.TPMS": "*"
     },
     "services": {
         "de.bmw.infotainment.telematic.oap.AppStatus": {
