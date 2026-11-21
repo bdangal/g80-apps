@@ -2,9 +2,17 @@
 
 **Bishal's M3 App** · `bishal_garage` · **0.1.0** · **iDrive 8 only**
 
-A first MGU/OAP app for a **2023 BMW G80 M3 Competition xDrive**, iDrive 8 / BDC3. Factory-cluster-inspired near-black/navy facets, crisp white tabular readings, angular blue/M-red scales and consistent blue focus. Your complete Midnight Purple car artwork is preserved and enlarged. A single red “Powered by Balkan Automotive” subtitle sits beneath the app name. Seven pages: **Overview / Performance / Fuel & Ethanol / Temperatures / Live Pulls / My Gauges / Balkan Automotive** (shop spotlight: "BRING YOUR FUCKING BMW HERE."). Live Pulls combines the G80-style RPM chevron and OEM-inspired red sport-display bars with boost, power, torque, speed, throttle and gear.
+A personal MGU/OAP app for a **2023 BMW G80 M3 Competition xDrive**, iDrive 8. M-style dark cluster look with the Midnight Purple car artwork. US units only (mph, gal, °F, psi, lb-ft, hp).
 
-**Read-only BMW live acquisition is implemented**, using native SOME/IP getters and DME OBD service-01 reads through TASU, following the published ID8 Car Data app's API pattern. It has **not been executed on this car**. Each reading appears only when its source answers; missing/stale data shows `--`, never demo fallback. Power calculated from ECU torque and RPM is labeled **EST.**, not dyno-measured horsepower. Ethanol, fuel %, range and odometer are still unmapped. No coding, diagnostic writes, tune/actuator controls, internet access, accounts or credentials are implemented. See [docs/DATA.md](docs/DATA.md) for exact interfaces, source provenance and limitations.
+Pages are grouped by the bottom buttons:
+
+- **Drive:** Overview, Performance, Live Pulls, Pull Graph, Peaks
+- **Track:** G-Meter, Brake Test (60-0), Drag Timer (1/8 and 1/4 mile), M Vitals (tire pressure and warm-up, gearbox oil)
+- **Garage:** Readiness, Fuel & Ethanol (E50 planner, 15.9 gal tank), Temperatures, Diagnostics (read-only fault scanner), My Gauges, Balkan Automotive
+
+Shift light on Performance and Live Pulls: on at 5500 rpm, flashing at 7000. Display only.
+
+**Read-only BMW live acquisition is implemented**, using native SOME/IP getters and DME OBD service-01 reads through TASU, following the published ID8 Car Data app's API pattern. It has **not been executed on this car**. Each reading appears only when its source answers; missing/stale data shows `--`, never demo fallback. Power calculated from ECU torque and RPM is labeled **EST.**, not dyno-measured horsepower. The fault scanner only reads stored codes (UDS `19 02`); it never clears them. No coding, diagnostic writes, tune/actuator controls, internet access, accounts or credentials are implemented. See [docs/DATA.md](docs/DATA.md) for exact interfaces, source provenance and limitations.
 
 **Status:** source-complete starter; desktop tests and packaging checks are available. Not tested on a physical head unit. BDC3 is the vehicle context, not a software interface this app accesses. Firmware/donor-specific SDK linking and the final in-car touch/controller test remain required.
 
