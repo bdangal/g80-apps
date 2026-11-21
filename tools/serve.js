@@ -26,7 +26,7 @@ http.createServer((req, res) => {
     }); return;
   }
   const shot = /^\/screenshots\/([a-z-]+)\.png$/.exec(url.pathname);
-  if (shot && captures.includes(shot[1])) {
+  if (shot && (captures.includes(shot[1]) || shot[1] === 'tour')) {
     res.setHeader('Content-Type', 'image/png');
     fs.createReadStream(path.join(root, 'docs/screenshots', shot[1] + '.png')).on('error', () => { res.statusCode = 404; res.end('Capture not generated'); }).pipe(res); return;
   }

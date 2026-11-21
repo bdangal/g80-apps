@@ -12,6 +12,22 @@ Pages are grouped by the bottom buttons:
 
 Shift light on Performance and Live Pulls: on at 5500 rpm, flashing at 7000. Display only.
 
+## Screenshots
+
+Rendered by the app's own drawing code at the head unit's 1440x382 size, using built-in sample data (not a recording from the car).
+
+![Tour of every page](docs/screenshots/tour.png)
+
+| Drive | Track | Garage |
+|---|---|---|
+| ![Overview](docs/screenshots/overview.png) Overview | ![G-Meter](docs/screenshots/g-meter.png) G-Meter | ![Readiness](docs/screenshots/readiness.png) Readiness |
+| ![Performance](docs/screenshots/performance.png) Performance | ![Brake Test](docs/screenshots/brake-test.png) Brake Test | ![Fuel & Ethanol](docs/screenshots/fuel-ethanol.png) Fuel & Ethanol |
+| ![Live Pulls](docs/screenshots/live-pulls.png) Live Pulls | ![Drag Timer](docs/screenshots/drag-timer.png) Drag Timer | ![Diagnostics](docs/screenshots/diagnostics-scanned.png) Diagnostics |
+| ![Pull Graph](docs/screenshots/pull-graph.png) Pull Graph | ![M Vitals](docs/screenshots/m-vitals.png) M Vitals | ![Temperatures](docs/screenshots/temperatures.png) Temperatures |
+| ![Peaks](docs/screenshots/peaks.png) Peaks | | ![Balkan Automotive](docs/screenshots/balkan-automotive.png) Balkan Automotive |
+
+Every page and state, including disconnected and stale data: [docs/screenshots/index.html](docs/screenshots/index.html). Rebuild the tour after recapturing with `node tools/tour.js`.
+
 **Read-only BMW live acquisition is implemented**, using native SOME/IP getters and DME OBD service-01 reads through TASU, following the published ID8 Car Data app's API pattern. It has **not been executed on this car**. Each reading appears only when its source answers; missing/stale data shows `--`, never demo fallback. Power calculated from ECU torque and RPM is labeled **EST.**, not dyno-measured horsepower. The fault scanner only reads stored codes (UDS `19 02`); it never clears them. No coding, diagnostic writes, tune/actuator controls, internet access, accounts or credentials are implemented. See [docs/DATA.md](docs/DATA.md) for exact interfaces, source provenance and limitations.
 
 **Status:** source-complete starter; desktop tests and packaging checks are available. Not tested on a physical head unit. BDC3 is the vehicle context, not a software interface this app accesses. Firmware/donor-specific SDK linking and the final in-car touch/controller test remain required.
