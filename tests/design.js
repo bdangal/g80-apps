@@ -34,7 +34,7 @@ module.exports = async function (test) {
     assert.deepStrictEqual(s.custom, ['speed', 'oil', 'gear']);
     assert.strictEqual(Model.display(s, 'speed', { value: 60, status: 'live' }).unit, 'mph', 'Saved metric preference changed units');
     Model.act(s, 4); assert(Model.rows(s)[2].includes('mph')); Model.act(s, 2); assert(!s.configDirty);
-    assert.deepStrictEqual(Model.settings(s), { gauges: ['speed', 'oil', 'gear'] });
+    assert.deepStrictEqual(Model.settings(s), { gauges: ['speed', 'oil', 'gear'], dynoBaseline: null });
     Model.configure(s, { gauges: ['rpm', 'rpm', 'boost'] }); assert.deepStrictEqual(s.custom, ['rpm', 'boost', 'power']);
   });
   await test('touch tabs and swipes use shared geometry without stealing native focus', () => {
@@ -161,7 +161,17 @@ module.exports = async function (test) {
     assert.strictEqual(s.visuals['rpm.tacho'].value, 2500 / 8000, 'Tachometer visual transition incorrect');
     const stale = new Recorder(font); View.tachometer(stale, font, s, { value: 7000, status: 'stale' }, 560, 76, 520, 231, 1080);
     assert(!s.visuals['rpm.tacho'], 'Stale RPM retained animation state');
-    [1, 4, 5].forEach((page) => { s.page = page; assert(View.draw(s, font).ops.some((op) => op.text === '1/min x 1000'), 'RPM layout not shared across pages'); });
+    [4, 5].forEach((page) => { s.page = page; assert(View.draw(s, font).ops.some((op) => op.text === '1/min x 1000'), 'RPM layout not shared across pages'); });
+  });
+  await test('Performance drops the RPM cluster and shows BM3 Live Adjust locked with no DME path', () => {
+    const fs = require('fs'), path = require('path'), s = Model.create('test', 'test', 'demo'); s.page = 1;
+    const labels = View.draw(s, font).ops.filter((op) => op.kind === 'text').map((op) => op.text);
+    assert(!labels.includes('ENGINE SPEED') && !labels.includes('1/min x 1000'), 'Performance still draws the RPM cluster');
+    assert(labels.includes('BM3 LIVE ADJUST') && labels.includes('LOCKED'), 'Locked Live Adjust panel missing');
+    ['MAP 1', 'MAP 2', 'MAP 3', 'MAP 4'].forEach((m) => assert(labels.includes(m)));
+    assert(Model.liveAdjust.locked && Model.summary(s).includes('LOCKED'));
+    const vehicle = fs.readFileSync(path.join(__dirname, '../apps/bishal_garage/src/vehicle.js'), 'utf8');
+    assert(!/WriteMemoryByAddress|0x3[dD]\b|mapSwActAddr/.test(vehicle), 'DME write path must not exist while Live Adjust is locked');
   });
   await test('OEM sport bars preserve zero missing and estimated engine values', () => {
     const Recorder = require('../apps/bishal_garage/src/record'), s = Model.create('test', 'test', 'demo');

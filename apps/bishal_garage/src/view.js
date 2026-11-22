@@ -5,12 +5,13 @@ const Recorder = require('./record.js');
 const WIDTH = 1440, HEIGHT = 382;
 const color = { white: '#f3f6fc', muted: '#94a4bb', quiet: '#62738b', blue: '#389cff', red: '#eb405c', track: '#24334a', navy: '#101b2b', line: '#263b56', demo: '#d9b675', corn: '#c6b66b', accent: '#ef5076' };
 const buttons = [{ x: 16, y: 340, w: 44, h: 36 }, { x: 68, y: 340, w: 44, h: 36 }, { x: 1004, y: 340, w: 136, h: 36 }, { x: 1148, y: 340, w: 132, h: 36 }, { x: 1288, y: 340, w: 136, h: 36 }];
-const groupButtons = Model.groups.map(function (g, i) { return { x: 16 + i * 90, y: 340, w: 84, h: 36, label: g.name, action: 40 + i }; });
-const icons = ['car', 'flag', 'fuel', 'temperature', 'trace', 'gauges', 'shop', 'graph', 'peak', 'gmeter', 'brake', 'drag', 'tyre', 'check', 'wrench'];
+const groupButtons = Model.groups.map(function (g, i) { return { x: 16 + i * 74, y: 340, w: 70, h: 36, label: g.name, action: 40 + i }; });
+const tabLeft = groupButtons[groupButtons.length - 1].x + 82;
+const icons = ['car', 'flag', 'fuel', 'temperature', 'trace', 'gauges', 'shop', 'graph', 'peak', 'gmeter', 'brake', 'drag', 'tyre', 'check', 'wrench', 'dyno', 'seat', 'camera', 'turn'];
 function editing(state) { return state && state.page === 5 && state.editing && !state.info; }
 // Sub-tabs of the current group. The My Gauges editor needs the arrow slots, so it drops the group buttons.
 function navigationTabs(state) {
-  const list = Model.groups[Model.groupOf(state ? state.page : 0)].pages, left = editing(state) ? 128 : 290, step = (996 - left) / list.length;
+  const list = Model.groups[Model.groupOf(state ? state.page : 0)].pages, left = editing(state) ? 128 : tabLeft, step = (996 - left) / list.length;
   return list.map(function (page, i) { return { x: left + i * step, y: 340, w: step - 6, h: 36, label: Model.pages[page], page: page, action: 10 + page }; });
 }
 function targets(state) {
@@ -252,6 +253,14 @@ function tabIcon(r, name, x, y, ink) {
     line([[2, 10], [7, 16], [18, 3]], 2.2);
   } else if (name === 'wrench') {
     line([[3, 17], [11, 9]], 3); circle(r, x + 14, y + 6, 4.5, ink, 1.6);
+  } else if (name === 'dyno') {
+    line([[2, 9], [6, 4], [15, 4], [18, 9], [2, 9]]); circle(r, x + 6, y + 14, 4, ink, 1.3); circle(r, x + 14, y + 14, 4, ink, 1.3); line([[1, 19], [19, 19]]);
+  } else if (name === 'seat') {
+    r.rect(x + 5, y + 1, 5, 3, ink, 1); line([[7, 5], [5, 13], [7, 15], [16, 15], [17, 18]], 1.7); line([[6, 15], [5, 19]]);
+  } else if (name === 'camera') {
+    line([[2, 6], [13, 6], [13, 16], [2, 16], [2, 6]], 1.5); line([[13, 9], [19, 5], [19, 17], [13, 13]]);
+  } else if (name === 'turn') {
+    line([[6, 19], [6, 10], [15, 10]], 2); line([[11, 5], [16, 10], [11, 15]], 2);
   } else {
     [3, 9, 15].forEach(function (left, i) {
       line([[left, 2], [left, 19]]); line([[left - 2, 6 + i * 4], [left + 2, 6 + i * 4]], 2.5);
@@ -268,7 +277,7 @@ function circle(r, cx, cy, radius, ink, weight) {
 function navigation(r, font, state) {
   r.rect(0, 334, WIDTH, 48, '#090f19');
   const edit = editing(state);
-  const labels = edit ? ['<', '>', 'Change gauge', 'Done', 'Reset'] : ['<', '>', state.info ? 'US units' : state.page === 5 ? 'Customize' : state.page === Model.PAGE.diagnostics ? 'Scan faults' : state.page === Model.PAGE.peaks && state.mode === 'live' ? 'Reset peaks' : state.mode === 'demo' ? 'New sample' : 'Auto reads', state.mode === 'demo' ? 'Go live' : 'Demo mode', state.info ? 'Close settings' : 'Settings'];
+  const labels = edit ? ['<', '>', 'Change gauge', 'Done', 'Reset'] : ['<', '>', state.info ? 'US units' : state.page === 5 ? 'Customize' : state.page === Model.PAGE.diagnostics ? 'Scan faults' : state.page === Model.PAGE.peaks && state.mode === 'live' ? 'Reset peaks' : state.page === Model.PAGE.dyno && state.mode === 'live' ? 'Pin baseline' : state.mode === 'demo' ? 'New sample' : 'Auto reads', state.mode === 'demo' ? 'Go live' : 'Demo mode', state.info ? 'Close settings' : 'Settings'];
   buttons.forEach(function (b, i) {
     if (i < 2 && !edit) return;
     if (i === state.focus) { r.rect(b.x, b.y, b.w, b.h, '#142942'); r.line(b.x + 3, b.y + b.h - 1, b.x + b.w - 3, b.y + b.h - 1, 2, color.blue); }
@@ -280,7 +289,7 @@ function navigation(r, font, state) {
       if (i === active) { r.polygon([[b.x + 8, b.y], [b.x + b.w, b.y], [b.x + b.w - 8, b.y + b.h], [b.x, b.y + b.h]], '#18304d', 1); r.line(b.x + 10, b.y + b.h - 1, b.x + b.w - 10, b.y + b.h - 1, 2, color.blue); }
       center(r, font, b.label.toUpperCase(), b.x + b.w / 2, b.y + 9, 14, i === active ? color.white : color.muted);
     });
-    r.line(282, 344, 276, 372, 1, color.line);
+    r.line(tabLeft - 6, 344, tabLeft - 12, 372, 1, color.line);
   }
   const next = !edit && state.focus < 2 ? Model.step(state.page, state.focus === 0 ? -1 : 1) : -1;
   navigationTabs(state).forEach(function (b) {
@@ -427,15 +436,137 @@ function brakeTest(r, font, state, s) {
   if (rec.message) r.text(rec.message, 36, 300, 13, color.demo);
   runTable(r, font, 'LAST THREE STOPS', runs, 560, 64, 840, [['DISTANCE', 380, function (x) { return dist(x.feet); }], ['TIME', 600, function (x) { return x.seconds.toFixed(2) + ' s'; }], ['PEAK DECEL', 830, function (x) { return x.peakG.toFixed(2) + ' g'; }]]);
 }
-function dragTimer(r, font, state) {
-  const rec = Model.records(state), run = state.mode === 'live' ? rec.drag : null;
-  const status = !run ? 'Stop the car to arm' : run.armed ? 'ARMED / launch when ready' : 'RUNNING ' + Math.round(run.feet) + ' ft';
-  r.text(state.mode === 'demo' ? 'Sample runs' : status, 36, 62, 18, run && run.start !== undefined ? color.red : color.white);
-  Model.Session.drags.forEach(function (d, i) {
-    const x = 36 + i * 690;
-    runTable(r, font, d.id.toUpperCase() + ' MILE', rec.dragRuns[d.id] || [], x, 98, 660, [['ET', 330, function (v) { return v.seconds.toFixed(2) + ' s'; }], ['TRAP', 640, function (v) { return v.trap.toFixed(1) + ' mph'; }]]);
+function dragTimer(r, font, state, now) {
+  const rec = Model.records(state), run = state.mode === 'live' ? rec.drag : null, running = run && run.start !== undefined;
+  const ready = run && run.armed && now - run.since >= 1000;
+  const status = state.mode === 'demo' ? 'Sample runs' : running ? 'RUNNING  ' + Math.round(run.feet) + ' ft' : ready ? 'ARMED / launch when ready' : run && run.armed ? 'Hold still to arm...' : 'Stop the car to arm';
+  r.text('STANDSTILL TIMER', 36, 58, 13, color.muted);
+  r.text(status, 34, 76, 26, running ? color.red : ready ? '#3fb37f' : color.white);
+  // Speed over time for the running run, else the last finished one.
+  const trace = running ? run.trace : rec.lastDrag ? rec.lastDrag.trace : [], gx = 60, gy = 128, gw = 470, gh = 170;
+  for (let i = 0; i <= 4; i++) { const yy = gy + gh - i * gh / 4; r.line(gx, yy, gx + gw, yy, 1, '#16253a'); right(r, font, String(i * 35), gx - 8, yy - 8, 11, color.quiet); }
+  const span = Math.max(12, trace.length ? trace[trace.length - 1][0] : 0);
+  for (let i = 0; i <= 4; i++) { const xx = gx + i * gw / 4; r.line(xx, gy, xx, gy + gh, 1, '#16253a'); center(r, font, (span * i / 4).toFixed(0) + ' s', xx, gy + gh + 6, 11, color.quiet); }
+  r.text('MPH', gx - 26, gy - 20, 11, color.quiet);
+  if (trace.length > 1) trace.slice(1).forEach(function (p, i) {
+    const a = trace[i];
+    r.line(gx + a[0] / span * gw, gy + gh * (1 - clamp(a[1] / 140)), gx + p[0] / span * gw, gy + gh * (1 - clamp(p[1] / 140)), 3, color.blue);
   });
-  r.text('From the car\'s speed signal (~10 Hz) from a standstill; no reaction time. Not a timing-slip result.', 36, 318, 11, color.quiet);
+  else center(r, font, 'Speed trace appears after a run', gx + gw / 2, gy + gh / 2 - 8, 14, color.quiet);
+  // Splits: best of the session with the latest run beside it.
+  const sx = 590, sw = 380;
+  r.text('SPEED SPLITS', sx, 58, 13, color.muted); right(r, font, 'LATEST', sx + 250, 60, 11, color.quiet); right(r, font, 'BEST', sx + sw, 60, 11, color.quiet);
+  Model.Session.splits.forEach(function (sp, i) {
+    const list = (rec.splitRuns || {})[sp.id] || [], y = 82 + i * 58;
+    r.polygon([[sx + 8, y], [sx + sw, y], [sx + sw - 8, y + 50], [sx, y + 50]], '#0b1a2e', 2);
+    r.line(sx + 3, y + 50, sx + 11, y, 3, sp.from ? color.red : color.blue);
+    r.text(sp.id + ' MPH', sx + 22, y + 15, 16, color.white);
+    const best = list.length ? Math.min.apply(null, list.map(function (v) { return v.seconds; })) : null;
+    right(r, font, list.length ? list[0].seconds.toFixed(2) + ' s' : '--', sx + 250, y + 11, 22, color.muted);
+    right(r, font, best === null ? '--' : best.toFixed(2) + ' s', sx + sw - 14, y + 7, 30, best === null ? color.quiet : color.white);
+  });
+  const dx = 1010, dw = 394;
+  Model.Session.drags.forEach(function (d, i) {
+    const list = rec.dragRuns[d.id] || [], y = 58 + i * 130, latest = list[0];
+    r.text(d.id.toUpperCase() + ' MILE', dx, y, 13, color.muted);
+    r.polygon([[dx + 8, y + 22], [dx + dw, y + 22], [dx + dw - 8, y + 112], [dx, y + 112]], '#0b1a2e', 2);
+    r.line(dx + 3, y + 112, dx + 11, y + 22, 3, i ? color.red : color.blue);
+    r.text('ET', dx + 24, y + 34, 11, color.quiet); r.text('TRAP', dx + 230, y + 34, 11, color.quiet);
+    r.text(latest ? latest.seconds.toFixed(2) : '--', dx + 22, y + 48, 40, latest ? color.white : color.quiet); r.text('s', dx + 150, y + 70, 15, color.muted);
+    r.text(latest ? latest.trap.toFixed(1) : '--', dx + 228, y + 48, 40, latest ? color.white : color.quiet); r.text('mph', dx + 336, y + 70, 15, color.muted);
+    if (list.length > 1) right(r, font, 'best ' + Math.min.apply(null, list.map(function (v) { return v.seconds; })).toFixed(2) + ' s', dx + dw - 14, y, 12, color.muted);
+  });
+  r.text('Car speed signal, ~10 Hz, from a standstill. No reaction time or rollout. Not a timing-slip result.', 36, 318, 11, color.quiet);
+}
+function dynoPage(r, font, state) {
+  const runs = Model.dynoRuns(state), run = runs[0], base = Model.dynoBaseline(state), gx = 70, gy = 72, gw = 860, gh = 228;
+  const curves = (run ? run.curve : []).concat(base ? base.curve : []);
+  const hpMax = Math.max(700, Math.ceil(Math.max.apply(null, curves.map(function (p) { return p.hp; }).concat([0])) / 100) * 100);
+  const tqMax = Math.max(700, Math.ceil(Math.max.apply(null, curves.map(function (p) { return p.lbft; }).concat([0])) / 100) * 100);
+  for (let i = 0; i <= 7; i++) { const xx = gx + i * gw / 7; r.line(xx, gy, xx, gy + gh, 1, '#16253a'); center(r, font, String(1 + i), xx, gy + gh + 6, 13, color.muted); }
+  for (let i = 0; i <= 4; i++) {
+    const yy = gy + gh - i * gh / 4;
+    r.line(gx, yy, gx + gw, yy, 1, '#16253a');
+    right(r, font, String(Math.round(hpMax * i / 4)), gx - 8, yy - 8, 12, '#ff6b7d'); r.text(String(Math.round(tqMax * i / 4)), gx + gw + 8, yy - 8, 12, '#7cc6ff');
+  }
+  r.text('HP EST.', gx - 54, gy - 22, 12, '#ff6b7d'); right(r, font, 'LB-FT', gx + gw + 40, gy - 22, 12, '#7cc6ff');
+  r.text('1/min x 1000', gx + gw / 2 - 40, gy + gh + 24, 11, color.quiet);
+  function px(rpm) { return gx + clamp((rpm - 1000) / 7000) * gw; }
+  function plot(curve, key, max, ink, weight) {
+    curve.slice(1).forEach(function (p, i) { r.line(px(curve[i].rpm), gy + gh * (1 - clamp(curve[i][key] / max)), px(p.rpm), gy + gh * (1 - clamp(p[key] / max)), weight, ink); });
+  }
+  if (base) { plot(base.curve, 'lbft', tqMax, '#1d3a5c', 2); plot(base.curve, 'hp', hpMax, '#5a2a3a', 2); }
+  if (run) { plot(run.curve, 'lbft', tqMax, color.blue, 3); plot(run.curve, 'hp', hpMax, color.red, 3); }
+  const p = 1010;
+  r.text('VIRTUAL DYNO / ONE GEAR', p, 58, 13, color.muted);
+  if (!run) {
+    r.text('No dyno pull yet', p, 82, 26, color.white);
+    r.text('Full throttle in one gear for', p, 122, 15, color.muted); r.text('1,500+ rpm on a flat, empty road.', p, 144, 15, color.muted);
+    const message = state.mode === 'live' && state.session && state.session.dynoMessage;
+    if (message) r.text(message, p, 176, 13, color.demo);
+  } else {
+    function delta(now, then) { const d = Math.round(now - then); return (d >= 0 ? '+' : '') + d; }
+    r.text('PEAK POWER', p, 84, 12, color.muted); r.text(run.peakHp.toFixed(0), p, 100, 44, color.white); r.text('hp @ ' + run.peakHpRpm, p + 112, 120, 15, color.muted);
+    r.text('PEAK TORQUE', p, 156, 12, color.muted); r.text(run.peakTq.toFixed(0), p, 172, 44, color.white); r.text('lb-ft @ ' + run.peakTqRpm, p + 112, 192, 15, color.muted);
+    r.text('About ' + run.wheelHp.toFixed(0) + ' hp at the wheels', p, 230, 14, color.muted);
+    if (base) {
+      const dh = run.peakHp - base.peakHp, dt = run.peakTq - base.peakTq;
+      r.text('VS BASELINE', p, 258, 12, color.muted);
+      r.text(delta(run.peakHp, base.peakHp) + ' hp', p, 274, 20, dh >= 0 ? '#3fb37f' : color.red);
+      r.text(delta(run.peakTq, base.peakTq) + ' lb-ft', p + 130, 274, 20, dt >= 0 ? '#3fb37f' : color.red);
+    } else r.text('Pin baseline to compare later runs.', p, 258, 13, color.quiet);
+  }
+  const d = Model.Session.dyno;
+  r.text((base ? 'Dim lines: baseline. ' : '') + 'Estimate from speed and g, not a dyno.', p, 300, 11, color.quiet);
+  r.text(Math.round(d.massKg * 2.20462) + ' lb with driver, ' + d.lossPct + '% drivetrain loss.', p, 316, 11, color.quiet);
+}
+// Map switching stays visibly locked until the write path is verified on this car's DME and head unit.
+function padlock(r, x, y, ink) {
+  r.rect(x, y + 8, 16, 12, ink, 2);
+  path(r, [[x + 3, y + 8], [x + 3, y + 4], [x + 6, y + 1], [x + 10, y + 1], [x + 13, y + 4], [x + 13, y + 8]], ink, 2);
+}
+function liveAdjustPanel(r, font, x, y, w, h) {
+  const la = Model.liveAdjust, grey = '#4a5668', edge = [[x + 18, y], [x + w, y], [x + w, y + h - 18], [x + w - 18, y + h], [x, y + h], [x, y + 18]];
+  r.polygon(edge, '#0b1320', 1);
+  path(r, edge.concat([edge[0]]), '#22324a', 1);
+  r.text('BM3 LIVE ADJUST', x + 22, y + 16, 14, color.muted);
+  padlock(r, x + w - 40, y + 14, grey);
+  la.maps.forEach(function (label, i) {
+    const bx = x + 22 + i * ((w - 44) / 4), bw = (w - 44) / 4 - 8, by = y + 56;
+    r.polygon([[bx + 6, by], [bx + bw, by], [bx + bw - 6, by + 44], [bx, by + 44]], '#101a29', 1);
+    path(r, [[bx + 6, by], [bx + bw, by], [bx + bw - 6, by + 44], [bx, by + 44], [bx + 6, by]], '#2a3446', 1);
+    center(r, font, label.toUpperCase(), bx + bw / 2, by + 13, 15, grey);
+  });
+  r.text('LOCKED', x + 22, y + 122, 20, grey);
+  r.text(la.reason + '.', x + 22, y + 152, 14, color.muted);
+  r.text('Map switching is off. Nothing is sent to the DME.', x + 22, y + 176, 12, color.quiet);
+}
+function cabin(r, font, state) {
+  const app = Model.cabinApps[state.page], grey = '#4a5668';
+  [['#6fc3ff', 0], ['#1f5cb0', 9], [color.red, 18]].forEach(function (stripe) { r.line(42 + stripe[1], 86, 52 + stripe[1], 62, 5, stripe[0]); });
+  r.text(app.title.toUpperCase(), 84, 56, 38, color.white);
+  r.text(app.by + ' / ' + app.id, 86, 104, 14, color.muted);
+  r.text('WHAT IT DOES', 36, 140, 12, color.muted);
+  app.does.forEach(function (line, i) {
+    path(r, [[38, 165 + i * 34], [44, 171 + i * 34], [38, 177 + i * 34]], color.red, 2);
+    r.text(line, 54, 160 + i * 34, 18, color.white);
+  });
+  const x = 760, y = 62, w = 644, h = 248, edge = [[x + 20, y], [x + w, y], [x + w, y + h - 20], [x + w - 20, y + h], [x, y + h], [x, y + 20]];
+  r.polygon(edge, '#0d1a2c', 1);
+  path(r, edge.concat([edge[0]]), '#2b4566', 1);
+  r.text('NEEDS ON THE HEAD UNIT', x + 26, y + 18, 12, color.muted);
+  app.needs.forEach(function (need, i) {
+    path(r, [[x + 28, y + 46 + i * 30], [x + 42, y + 46 + i * 30], [x + 42, y + 60 + i * 30], [x + 28, y + 60 + i * 30], [x + 28, y + 46 + i * 30]], color.muted, 1);
+    r.text(need, x + 54, y + 42 + i * 30, 17, color.white);
+  });
+  const by = y + 150;
+  r.polygon([[x + 34, by], [x + 300, by], [x + 292, by + 44], [x + 26, by + 44]], '#101a29', 1);
+  path(r, [[x + 34, by], [x + 300, by], [x + 292, by + 44], [x + 26, by + 44], [x + 34, by]], '#2a3446', 1);
+  padlock(r, x + 46, by + 11, grey);
+  r.text('OPEN ' + app.title.toUpperCase(), x + 74, by + 12, 17, grey);
+  r.text('Launching from here is not verified yet.', x + 320, by + 4, 13, color.muted);
+  r.text('Open it from the iDrive app list.', x + 320, by + 24, 13, color.muted);
+  r.text('Separate MGU Store app; its license does not allow building it in.', x + 26, y + h - 30, 12, color.quiet);
 }
 function vitals(r, font, state, s) {
   r.polygon([[220, 66], [360, 66], [392, 110], [392, 270], [360, 314], [220, 314], [188, 270], [188, 110]], '#0d1828', 1);
@@ -589,10 +720,10 @@ function draw(state, font, now) {
     flag(r, s.odometer, 780, 316);
   } else if (state.page === 1) {
     instrument(r, font, state, 'boost', s.boost, 30, 76, 480, 231, color.blue, now);
-    tachometer(r, font, state, s.rpm, 560, 76, 520, 231, now);
-    metric(r, state, 'speed', s.speed, 1140, 65, 51);
-    history(r, font, state, frame, 585, 260, 300, 24);
-    sportBar(r, font, state, 'torque', s.torque, 1140, 218, 274, now);
+    metric(r, state, 'speed', s.speed, 560, 60, 48);
+    sportBar(r, font, state, 'torque', s.torque, 560, 146, 410, now);
+    history(r, font, state, frame, 560, 268, 410, 30);
+    liveAdjustPanel(r, font, 1010, 62, 400, 248);
   } else if (state.page === 2) {
     instrument(r, font, state, 'ethanol', s.ethanol, 30, 76, 485, 231, color.blue, now);
     r.text('FUEL REMAINING', 596, 69, 17, color.muted);
@@ -633,7 +764,9 @@ function draw(state, font, now) {
   } else if (state.page === Model.PAGE.peaks) { peaks(r, font, state);
   } else if (state.page === Model.PAGE.gmeter) { gMeter(r, font, state, s);
   } else if (state.page === Model.PAGE.brake) { brakeTest(r, font, state, s);
-  } else if (state.page === Model.PAGE.drag) { dragTimer(r, font, state);
+  } else if (state.page === Model.PAGE.drag) { dragTimer(r, font, state, now);
+  } else if (state.page === Model.PAGE.dyno) { dynoPage(r, font, state);
+  } else if (Model.cabinApps[state.page]) { cabin(r, font, state);
   } else if (state.page === Model.PAGE.vitals) { vitals(r, font, state, s);
   } else if (state.page === Model.PAGE.readiness) { readiness(r, font, state, s);
   } else if (state.page === Model.PAGE.diagnostics) { diagnostics(r, font, state);

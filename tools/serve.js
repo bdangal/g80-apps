@@ -12,7 +12,7 @@ http.createServer((req, res) => {
   const url = new URL(req.url, 'http://127.0.0.1');
   if (url.pathname === '/developer') { res.writeHead(302, { Location: '/?developer=1' }); res.end(); return; }
   if (url.pathname === '/gallery') { res.writeHead(302, { Location: '/screenshots/index.html' }); res.end(); return; }
-  const pages = ['overview', 'performance', 'fuel-ethanol', 'temperatures', 'live-pulls', 'my-gauges', 'balkan-automotive', 'pull-graph', 'peaks', 'g-meter', 'brake-test', 'drag-timer', 'm-vitals', 'readiness', 'diagnostics'];
+  const pages = ['overview', 'performance', 'fuel-ethanol', 'temperatures', 'live-pulls', 'my-gauges', 'balkan-automotive', 'pull-graph', 'peaks', 'g-meter', 'brake-test', 'drag-timer', 'm-vitals', 'readiness', 'diagnostics', 'dyno', 'seats', 'drive-recorder', 'turn-view'];
   const captures = pages.concat(pages.map((name) => name + '-disconnected'), ['my-gauges-fuel', 'my-gauges-fuel-disconnected', 'my-gauges-editor', 'estimated-power-fixture', 'disconnected', 'stale', 'live-pulls-stale', 'settings', 'unavailable', 'diagnostics-scanned']);
   const capture = /^\/capture\/([a-z-]+)$/.exec(url.pathname);
   if (req.method === 'POST' && capture && captures.includes(capture[1])) {

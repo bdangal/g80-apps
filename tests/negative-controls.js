@@ -5,6 +5,10 @@ const path = require('path');
 const cp = require('child_process');
 const Module = require('module');
 const controls = [
+  { name: 'drag-standstill-arm', target: 'session.js', filter: 'drag timer measures', old: 'if (prev.t - run.since < 1000) { session.drag = null; return; }', replacement: '', error: 'A brief stop armed the timer' },
+  { name: 'dyno-drivetrain-loss', target: 'session.js', filter: 'virtual dyno', old: 'w: wheel / (1 - dyno.lossPct / 100)', replacement: 'w: wheel', error: 'Road-load power wrong' },
+  { name: 'dyno-unpin', target: 'model.js', filter: 'virtual dyno', old: 'state.dynoBaseline && state.dynoBaseline.at === latest.at ? null : validRun(latest)', replacement: 'validRun(latest)', error: 'Pinning the same run again must unpin' },
+  { name: 'performance-no-rpm', target: 'view.js', filter: 'Performance drops the RPM', old: "    metric(r, state, 'speed', s.speed, 560, 60, 48);", replacement: "    tachometer(r, font, state, s.rpm, 560, 76, 520, 231, now);", error: 'Performance still draws the RPM cluster' },
   { name: 'balkan-logo', target: 'view.js', filter: 'Balkan showcase shows', old: 'r.image(2, 114, 133, 495, 116);', replacement: '', error: 'Balkan logo missing' },
   { name: 'balkan-summary', target: 'model.js', filter: 'Balkan showcase shows', old: "if (state.page === 6) return prefix + 'Shop showcase", replacement: "if (false) return prefix + 'Shop showcase", error: 'Showcase native summary missing' },
   { name: 'grouped-tab-layout', target: 'view.js', filter: 'grouped tabs have disjoint', old: '(996 - left) / list.length', replacement: '170', error: 'Tab overlaps native action strip' },

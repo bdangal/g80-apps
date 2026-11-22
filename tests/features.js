@@ -91,11 +91,17 @@ module.exports = async function (test) {
     const s = Session.create();
     for (let run = 0; run < 4; run++) {
       const start = run * 100000; let mph = 0, t = start;
-      Session.feed(s, { speed: live(0, t) }, t); t += 100; Session.feed(s, { speed: live(0, t) }, t);
+      for (let i = 0; i <= 12; i++) { Session.feed(s, { speed: live(0, t) }, t); t += 100; }
       for (let i = 0; i < 400; i++) { t += 100; mph += 1; Session.feed(s, { speed: live(mph, t) }, t); }
       for (let i = 0; i < 30; i++) { t += 100; mph = Math.max(0, mph - 10); Session.feed(s, { speed: live(mph, t) }, t); }
     }
     assert.strictEqual(s.dragRuns['1/4'].length, 3, 'Must keep the last three quarter-mile runs');
+    // Constant 10 mph/s from 1 mph: every speed split is (to - from) / 10 seconds.
+    [['0-30', 2.9], ['0-60', 5.9], ['0-100', 9.9], ['60-130', 7]].forEach((x) => assert(Math.abs(s.splitRuns[x[0]][0].seconds - x[1]) < 0.12, 'Split wrong: ' + x[0] + ' ' + s.splitRuns[x[0]][0].seconds));
+    assert(s.lastDrag && s.lastDrag.trace.length > 50 && s.lastDrag.trace[s.lastDrag.trace.length - 1][1] > 130, 'Speed trace missing');
+    const rolling = Session.create(); let t = 0;
+    [0, 0].concat(Array.from({ length: 35 }, (x, i) => i + 1)).forEach((v) => { t += 100; Session.feed(rolling, { speed: live(v, t) }, t); });
+    assert.strictEqual(rolling.splitRuns['0-30'].length, 0, 'A brief stop armed the timer');
     // Constant 10 mph/s from 1 mph: distance(ft) = 7.333 * t^2 relative to the 1 mph start.
     const eighth = s.dragRuns['1/8'][0];
     assert(Math.abs(eighth.seconds - Math.sqrt(660 / (10 * 5280 / 3600 / 2))) < 0.15, 'Eighth-mile time wrong: ' + eighth.seconds);
@@ -118,8 +124,9 @@ module.exports = async function (test) {
   });
   await test('session timers drop runs on data gaps and never use stale samples', () => {
     const s = Session.create();
-    [[0, 0], [100, 0], [200, 1.5], [300, 3], [400, 4.5], [2500, 30]].forEach((p) => Session.feed(s, { speed: live(p[1], p[0]) }, p[0]));
-    for (let t = 2600, mph = 31; t < 12000; t += 100, mph += 0.8) Session.feed(s, { speed: live(mph, t) }, t);
+    for (let t = 0; t <= 1200; t += 100) Session.feed(s, { speed: live(0, t) }, t);
+    [[1300, 1.5], [1400, 3], [1500, 4.5], [3600, 30]].forEach((p) => Session.feed(s, { speed: live(p[1], p[0]) }, p[0]));
+    for (let t = 3700, mph = 31; t < 13000; t += 100, mph += 0.8) Session.feed(s, { speed: live(mph, t) }, t);
     assert.strictEqual(s.dragRuns['1/8'].length, 0, 'Gap produced a drag run');
     Session.feed(s, { speed: { value: 80, status: 'stale', timestamp: 2600 } }, 2600);
     assert.strictEqual(s.last, null, 'Stale speed kept a run alive');
@@ -147,5 +154,37 @@ module.exports = async function (test) {
       return View.draw(s, font, 1000).ops.filter((o) => o.kind === 'rect' && o.y >= 16 && o.y < 28 && o.color !== '#18243a' && o.color !== '#090f19').length;
     }
     assert.strictEqual(lit(4000), 0); assert(lit(6200) > 0 && lit(6200) < lit(6900), 'Shift light does not climb with RPM');
+  });
+  await test('virtual dyno computes road-load power for one gear and pins a saved baseline', () => {
+    const s = Session.create(), d = Session.dyno; let t = 0;
+    function feed(mph, g, rpm) { t += 50; Session.feed(s, { speed: live(mph, t), gLong: live(g, t), rpm: live(rpm, t) }, t); }
+    for (let mph = 30; mph <= 80; mph += 0.4) feed(mph, 0.5, mph * 70);
+    for (let i = 0; i < 14; i++) feed(80, 0, 5600);
+    assert.strictEqual(s.dynoRuns.length, 1, 'Dyno run not recorded');
+    const run = s.dynoRuns[0], v = 80 * 0.44704, m = d.massKg;
+    const watts = (m * 0.5 * 9.80665 * v + 0.5 * d.rho * d.cdA * v * v * v + d.crr * m * 9.80665 * v) / (1 - d.lossPct / 100);
+    assert(Math.abs(run.peakHp - watts / 745.7) / (watts / 745.7) < 0.03, 'Road-load power wrong: ' + run.peakHp + ' vs ' + watts / 745.7);
+    assert(run.peakHpRpm >= 5400 && run.curve.length > 20);
+    for (let mph = 30; mph <= 40; mph += 1) feed(mph, 0.5, mph * 70);
+    for (let i = 0; i < 14; i++) feed(40, 0, 2800);
+    assert.strictEqual(s.dynoRuns.length, 1, 'A pull under 1,500 rpm counted'); assert(/too short/.test(s.dynoMessage));
+    const st = Model.create('test', 'test', 'live'); st.session = s; st.page = Model.PAGE.dyno;
+    Model.act(st, 2); assert(st.dynoBaseline && st.dynoBaseline.at === run.at && st.configDirty, 'Pin baseline failed');
+    const saved = JSON.parse(JSON.stringify(Model.settings(st))), restored = Model.create('test');
+    Model.configure(restored, saved); assert.strictEqual(Math.round(restored.dynoBaseline.peakHp), Math.round(run.peakHp), 'Baseline not persisted');
+    Model.configure(restored, { gauges: ['rpm', 'boost', 'power'], dynoBaseline: { at: 1, curve: [{ rpm: 'x' }] } }); assert.strictEqual(restored.dynoBaseline, null, 'Malformed baseline accepted');
+    Model.act(st, 2); assert.strictEqual(st.dynoBaseline, null, 'Pinning the same run again must unpin');
+  });
+  await test('Cabin pages list their separate apps with a locked launch and no vehicle actions', () => {
+    const s = Model.create('test', 'test', 'demo');
+    assert.deepStrictEqual(Model.groups.map((g) => g.name), ['Drive', 'Track', 'Cabin', 'Garage']);
+    assert.deepStrictEqual(Model.groups[1].pages, [9, 10, 11, Model.PAGE.dyno, 12]);
+    [[Model.PAGE.seats, 'Comfort tool'], [Model.PAGE.recorder, 'Drive Recorder player tool'], [Model.PAGE.turnView, 'Cluster renderer']].forEach((x) => {
+      s.page = x[0]; const before = JSON.stringify(Model.settings(s));
+      const texts = View.draw(s, font).ops.filter((op) => op.kind === 'text').map((op) => op.text);
+      assert(texts.includes(x[1]) && texts.some((tx) => /^OPEN /.test(tx)) && texts.includes('Launching from here is not verified yet.'), 'Cabin page incomplete: ' + Model.pages[x[0]]);
+      assert(Model.summary(s).includes('not verified'));
+      Model.act(s, 2); assert.strictEqual(JSON.stringify(Model.settings(s)), before);
+    });
   });
 };

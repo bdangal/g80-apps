@@ -120,7 +120,7 @@ module.exports = async function (test) {
   await test('Live Pulls fifth page has angular M instruments and honest stale states', () => {
     const s = Model.create('0.1.0', 'test', 'demo'); Model.act(s, 14); assert.strictEqual(s.page, 4);
     const frame = View.draw(s, font, now), labels = frame.ops.filter((op) => op.kind === 'text').map((op) => op.text);
-    assert.strictEqual(Model.pages.length, 15); assert(labels.includes('DRIVE  3 / 5')); assert(labels.includes('ENGINE POWER'));
+    assert.strictEqual(Model.pages.length, 19); assert(labels.includes('DRIVE  3 / 5')); assert(labels.includes('ENGINE POWER'));
     assert(labels.includes("Bishal's M3 App"));
     assert.strictEqual(frame.ops.filter((op) => op.kind === 'arc').length, 0, 'Circular progress gauges must not return');
     assert(!frame.ops.some((op) => op.color === '#b778ff'), 'Purple belongs in vehicle artwork');

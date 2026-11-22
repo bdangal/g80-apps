@@ -7,10 +7,13 @@ A personal MGU/OAP app for a **2023 BMW G80 M3 Competition xDrive**, iDrive 8. M
 Pages are grouped by the bottom buttons:
 
 - **Drive:** Overview, Performance, Live Pulls, Pull Graph, Peaks
-- **Track:** G-Meter, Brake Test (60-0), Drag Timer (1/8 and 1/4 mile), M Vitals (tire pressure and warm-up, gearbox oil)
+- **Track:** G-Meter, Brake Test (60-0), Drag Timer (0-30, 0-60, 0-100, 60-130 mph, 1/8 and 1/4 mile, speed trace), Dyno (one-gear road-load power and torque with a saved baseline), M Vitals (tire pressure and warm-up, gearbox oil)
+- **Cabin:** Seats, Drive Recorder, Turn View. These are separate IterioDev apps from the MGU Store; each page lists what to install, and the launch button stays locked until launching is verified in the car.
 - **Garage:** Readiness, Fuel & Ethanol (E50 planner, 15.9 gal tank), Temperatures, Diagnostics (read-only fault scanner), My Gauges, Balkan Automotive
 
 Shift light on Performance and Live Pulls: on at 5500 rpm, flashing at 7000. Display only.
+
+Performance has a **BM3 Live Adjust** panel (maps 1-4) that is **locked**: nothing is sent to the DME until map switching is verified on iDrive 8 with bootmod3.
 
 ## Screenshots
 
@@ -18,17 +21,18 @@ Rendered by the app's own drawing code at the head unit's 1440x382 size, using b
 
 ![Tour of every page](docs/screenshots/tour.png)
 
-| Drive | Track | Garage |
+| Drive | Track | Cabin / Garage |
 |---|---|---|
 | ![Overview](docs/screenshots/overview.png) Overview | ![G-Meter](docs/screenshots/g-meter.png) G-Meter | ![Readiness](docs/screenshots/readiness.png) Readiness |
 | ![Performance](docs/screenshots/performance.png) Performance | ![Brake Test](docs/screenshots/brake-test.png) Brake Test | ![Fuel & Ethanol](docs/screenshots/fuel-ethanol.png) Fuel & Ethanol |
 | ![Live Pulls](docs/screenshots/live-pulls.png) Live Pulls | ![Drag Timer](docs/screenshots/drag-timer.png) Drag Timer | ![Diagnostics](docs/screenshots/diagnostics-scanned.png) Diagnostics |
 | ![Pull Graph](docs/screenshots/pull-graph.png) Pull Graph | ![M Vitals](docs/screenshots/m-vitals.png) M Vitals | ![Temperatures](docs/screenshots/temperatures.png) Temperatures |
-| ![Peaks](docs/screenshots/peaks.png) Peaks | | ![Balkan Automotive](docs/screenshots/balkan-automotive.png) Balkan Automotive |
+| ![Peaks](docs/screenshots/peaks.png) Peaks | ![Dyno](docs/screenshots/dyno.png) Dyno | ![Balkan Automotive](docs/screenshots/balkan-automotive.png) Balkan Automotive |
+| | | ![Seats](docs/screenshots/seats.png) Seats (Cabin) |
 
 Every page and state, including disconnected and stale data: [docs/screenshots/index.html](docs/screenshots/index.html). Rebuild the tour after recapturing with `node tools/tour.js`.
 
-**Read-only BMW live acquisition is implemented**, using native SOME/IP getters and DME OBD service-01 reads through TASU, following the published ID8 Car Data app's API pattern. It has **not been executed on this car**. Each reading appears only when its source answers; missing/stale data shows `--`, never demo fallback. Power calculated from ECU torque and RPM is labeled **EST.**, not dyno-measured horsepower. The fault scanner only reads stored codes (UDS `19 02`); it never clears them. No coding, diagnostic writes, tune/actuator controls, internet access, accounts or credentials are implemented. See [docs/DATA.md](docs/DATA.md) for exact interfaces, source provenance and limitations.
+**Read-only BMW live acquisition is implemented**, using native SOME/IP getters and DME OBD service-01 reads through TASU, following the published ID8 Car Data app's API pattern. It has **not been executed on this car**. Each reading appears only when its source answers; missing/stale data shows `--`, never demo fallback. Power calculated from ECU torque and RPM is labeled **EST.**, not dyno-measured horsepower. The fault scanner only reads stored codes (UDS `19 02`); it never clears them. No coding, diagnostic writes, tune/actuator controls (Live Adjust is drawn but locked), internet access, accounts or credentials are implemented. See [docs/DATA.md](docs/DATA.md) for exact interfaces, source provenance and limitations.
 
 **Status:** source-complete starter; desktop tests and packaging checks are available. Not tested on a physical head unit. BDC3 is the vehicle context, not a software interface this app accesses. Firmware/donor-specific SDK linking and the final in-car touch/controller test remain required.
 
@@ -139,7 +143,7 @@ Generated RHMI resources, app icon and font artwork are committed because repo-t
 | Page | Visuals and units |
 | --- | --- |
 | 01 Overview | Your complete transparent M3 image, connection/data state, speed, fuel level, range and odometer (mph/mi) |
-| 02 Performance | Large actual boost gauge (gauge PSI, including vacuum), G80 chevron tachometer, speed and compact boost history when supplied |
+| 02 Performance | Large actual boost gauge (gauge PSI, including vacuum), speed, torque, compact boost history and the locked BM3 Live Adjust panel. No RPM cluster: the car's own cluster shows it |
 | 03 Fuel & Ethanol | Ethanol percentage and E-number (44% / E44), separate fuel-remaining bar and range |
 | 04 Temperatures | Faceted oil, coolant and intake-air instruments, default °F, angular scales and explicit validity |
 | 05 Live Pulls | G80 M-red RPM chevron, boost readout, stacked red engine-power/torque sport bars; speed, throttle and gear |
@@ -153,7 +157,9 @@ About/version is a separate information overlay, not a seventh dashboard page. L
 
 **Units:** US only, everywhere: mph, PSI, °F, miles, gallons, feet, lb-ft and hp. There is no metric option; a previously saved metric preference is ignored. Canonical acquisition values are unchanged.
 
-**Navigation:** three groups on the bottom bar, each with its own tabs. **Drive:** Overview, Performance, Live Pulls, Pull Graph, Peaks. **Track:** G-Meter, Brake Test, Drag Timer, M Vitals. **Garage:** Readiness, Fuel & Ethanol, Temperatures, Diagnostics, My Gauges, Balkan Automotive (last). Previous/next and swipes run through all 15 pages in that order.
+**Navigation:** four groups on the bottom bar, each with its own tabs. **Drive:** Overview, Performance, Live Pulls, Pull Graph, Peaks. **Track:** G-Meter, Brake Test, Drag Timer, Dyno, M Vitals. **Cabin:** Seats, Drive Recorder, Turn View. **Garage:** Readiness, Fuel & Ethanol, Temperatures, Diagnostics, My Gauges, Balkan Automotive (last). Previous/next and swipes run through all 19 pages in that order.
+
+**Drag Timer:** arms after a full second at a standstill, starts at 1 mph, records 0-30 / 0-60 / 0-100 / 60-130 mph and 1/8 and 1/4 mile ET and trap, and keeps a speed-over-time trace of the last run. Ends when you lift (3 mph below top speed) or after 40 s. Logic follows cauliflowermossgrape/idrive7-apps (MIT). **Dyno:** while pulling at over 0.12 g, 9 mph and 1200 rpm, wheel power = mass x accel x speed + aero + rolling drag (4090 lb with driver, sedan drag area 0.62 m², 15% drivetrain loss), binned per 100 rpm and smoothed; the tallest gear with 1,500+ rpm wins. **Pin baseline** saves the latest run on the head unit and draws it dimmed behind later runs. It is an estimate, not a dyno.
 
 Demo mode has two deterministic snapshots, not live readings. Refresh changes only the demo sample, never invents data in live mode and never changes the page. Ethanol is **not inferred from fuel level, a fuel-grade label or flex-fuel hardware ownership**. Boost normalization requires declared units/reference and synchronized valid ambient pressure for absolute sources; it never subtracts a guessed atmosphere. Gauge bounds are display scales, not diagnostic or tune limits.
 

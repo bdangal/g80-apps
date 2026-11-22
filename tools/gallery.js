@@ -1,10 +1,11 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-// Captures follow the app's grouped order (Drive / Track / Garage), Balkan last.
+// Captures follow the app's grouped order (Drive / Track / Cabin / Garage), Balkan last.
 const groups = [
   ['Drive', [['overview', 'Overview'], ['performance', 'Performance'], ['live-pulls', 'Live Pulls'], ['pull-graph', 'Pull Graph'], ['peaks', 'Peaks']]],
-  ['Track', [['g-meter', 'G-Meter'], ['brake-test', 'Brake Test'], ['drag-timer', 'Drag Timer'], ['m-vitals', 'M Vitals']]],
+  ['Track', [['g-meter', 'G-Meter'], ['brake-test', 'Brake Test'], ['drag-timer', 'Drag Timer'], ['dyno', 'Dyno'], ['m-vitals', 'M Vitals']]],
+  ['Cabin', [['seats', 'Seats'], ['drive-recorder', 'Drive Recorder'], ['turn-view', 'Turn View']]],
   ['Garage', [['readiness', 'Readiness'], ['fuel-ethanol', 'Fuel & Ethanol'], ['temperatures', 'Temperatures'], ['diagnostics', 'Diagnostics'], ['my-gauges', 'My Gauges'], ['balkan-automotive', 'Balkan Automotive']]]
 ];
 function image(name, alt) { return '<a href="/screenshots/' + name + '.png" target="_blank"><img src="/screenshots/' + name + '.png" width="1440" height="382" loading="lazy" alt="' + alt + '"></a>'; }

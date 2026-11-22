@@ -6,8 +6,8 @@ const path = require('path');
 const zlib = require('zlib');
 
 const dir = path.join(__dirname, '..', 'docs', 'screenshots');
-const pages = ['overview', 'performance', 'live-pulls', 'pull-graph', 'peaks', 'g-meter', 'brake-test', 'drag-timer',
-  'm-vitals', 'readiness', 'fuel-ethanol', 'temperatures', 'diagnostics-scanned', 'my-gauges', 'balkan-automotive'];
+const pages = ['overview', 'performance', 'live-pulls', 'pull-graph', 'peaks', 'g-meter', 'brake-test', 'drag-timer', 'dyno',
+  'm-vitals', 'readiness', 'fuel-ethanol', 'temperatures', 'diagnostics-scanned', 'my-gauges', 'balkan-automotive', 'seats', 'drive-recorder', 'turn-view'];
 const delayMs = 2500;
 
 const crcTable = Array.from({ length: 256 }, (_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; return c >>> 0; });
